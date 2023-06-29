@@ -19,7 +19,7 @@ namespace WebAddressbookTests
         private StringBuilder verificationErrors;
         private string baseURL;
         private bool acceptNextAlert = true;
-        //поля с типом данных или коротко, данные, которые обрабатывают методы ниже
+        //поля класса=атрибут класса=параметр класса=свойство класса, с типом данных или коротко, данные, которые обрабатывают методы ниже
 
         [SetUp]
         public void SetupTest()
@@ -47,26 +47,65 @@ namespace WebAddressbookTests
         public void GroupCreationTest()
         //тестовый метод в классе GroupCreationTest 
         {
-            driver.Navigate().GoToUrl(baseURL);
-            driver.FindElement(By.Name("user")).Click();
-            driver.FindElement(By.Name("user")).Clear();
-            driver.FindElement(By.Name("user")).SendKeys("admin");
-            driver.FindElement(By.Name("pass")).Clear();
-            driver.FindElement(By.Name("pass")).SendKeys("secret");
-            driver.FindElement(By.XPath("//input[@value='Login']")).Click();
-            driver.FindElement(By.LinkText("groups")).Click();
+            OpenHomePage();
+            Login(new AccountData("admin","secret"));//вызов метода с конкретными параметрами
+            GotoGroupsPage();
+            InitGroupCreation();
+            GroupData group = new GroupData("aaa");
+            group.Header = "bbb";
+            group.Footer = "ccc";
+            FillGroupForm(group); 
+            SubmitGroupCreation();
+            ReturnToGroupsPage();
+        }
+
+        private void ReturnToGroupsPage()
+        {
+            driver.FindElement(By.LinkText("group page")).Click();
+        }
+
+        private void SubmitGroupCreation()
+        {
+            driver.FindElement(By.Name("submit")).Click();
+        }
+
+        private void InitGroupCreation()
+        {
             driver.FindElement(By.Name("new")).Click();
+        }
+
+        private void GotoGroupsPage()
+        {
+            driver.FindElement(By.LinkText("groups")).Click();
+        }
+
+        private void FillGroupForm(GroupData group) //в метод передает объект group типа GroupData 
+        {
             driver.FindElement(By.Name("group_name")).Click();
             driver.FindElement(By.Name("group_name")).Clear();
-            driver.FindElement(By.Name("group_name")).SendKeys("group test2");
+            driver.FindElement(By.Name("group_name")).SendKeys(group.Name); //сюда передаем свойство Name объекта GroupData
             driver.FindElement(By.Name("group_header")).Clear();
-            driver.FindElement(By.Name("group_header")).SendKeys("group test2");
+            driver.FindElement(By.Name("group_header")).SendKeys(group.Header);//сюда передаем свойство Header объекта GroupData
             driver.FindElement(By.Name("group_footer")).Clear();
-            driver.FindElement(By.Name("group_footer")).SendKeys("group test2");
-            driver.FindElement(By.Name("submit")).Click();
-            driver.FindElement(By.LinkText("group page")).Click();
-            driver.FindElement(By.LinkText("Logout")).Click();
+            driver.FindElement(By.Name("group_footer")).SendKeys(group.Footer);
         }
+
+        //описание метода
+        private void Login(AccountData account)
+        {
+            driver.FindElement(By.Name("user")).Click();
+            driver.FindElement(By.Name("user")).Clear();
+            driver.FindElement(By.Name("user")).SendKeys(account.Username);
+            driver.FindElement(By.Name("pass")).Clear();
+            driver.FindElement(By.Name("pass")).SendKeys(account.Password);
+            driver.FindElement(By.XPath("//input[@value='Login']")).Click();
+        }
+
+        private void OpenHomePage()
+        {
+            driver.Navigate().GoToUrl(baseURL);
+        }
+
         private bool IsElementPresent(By by)
         {
             try
